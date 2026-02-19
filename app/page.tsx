@@ -1,65 +1,203 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
+import { questions } from "@/lib/questions";
+import { calculateScore, getBand } from "@/lib/score";
 
 export default function Home() {
+  const [stage, setStage] = useState<"lead" | "questions" | "result">("lead");
+  const [current, setCurrent] = useState(0);
+  const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [lead, setLead] = useState({
+    email: "",
+    role: "",
+    companySize: "",
+  });
+
+  const question = questions[current];
+
+  function handleAnswer(score: number) {
+  setAnswers((prev) => ({
+    ...prev,
+    [question.id]: score,
+  }));
+
+  if (current + 1 < questions.length) {
+    setCurrent(current + 1);
+  }
+}
+
+  const progress =
+    stage === "questions"
+      ? ((current + 1) / questions.length) * 100
+      : stage === "result"
+      ? 100
+      : 0;
+
+  // =========================
+  // LEAD CAPTURE SCREEN
+  // =========================
+
+  if (stage === "lead") {
+  const isValid =
+    lead.email.trim() !== "" &&
+    lead.role.trim() !== "" &&
+    lead.companySize.trim() !== "";
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <main className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white shadow-2xl rounded-2xl p-12 w-full max-w-lg space-y-6">
+        <h1 className="text-3xl font-bold text-black text-center">
+          Experimentation Maturity Assessment
+        </h1>
+
+        {/* Work Email */}
+        <input
+          type="email"
+          placeholder="Work Email"
+          required
+          className="w-full border border-gray-300 p-4 rounded-lg text-black placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={lead.email}
+          onChange={(e) =>
+            setLead({ ...lead, email: e.target.value })
+          }
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+
+        {/* Role Dropdown */}
+        <select
+          required
+          className="w-full border border-gray-300 p-4 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={lead.role}
+          onChange={(e) =>
+            setLead({ ...lead, role: e.target.value })
+          }
+        >
+          <option value="">Select Role</option>
+          <option value="Executive">Executive</option>
+          <option value="Product">Product</option>
+          <option value="Marketing">Marketing</option>
+          <option value="Growth">Growth</option>
+          <option value="Engineering">Engineering</option>
+          <option value="Data">Data / Analytics</option>
+          <option value="Other">Other</option>
+        </select>
+
+        {/* Company Size Dropdown */}
+        <select
+          required
+          className="w-full border border-gray-300 p-4 rounded-lg text-black focus:outline-none focus:ring-2 focus:ring-blue-500"
+          value={lead.companySize}
+          onChange={(e) =>
+            setLead({ ...lead, companySize: e.target.value })
+          }
+        >
+          <option value="">Select Company Size</option>
+          <option value="1-50">1–50</option>
+          <option value="51-200">51–200</option>
+          <option value="201-1000">201–1000</option>
+          <option value="1000+">1000+</option>
+        </select>
+
+        <button
+          disabled={!isValid}
+          onClick={() => setStage("questions")}
+          className={`w-full p-4 rounded-lg font-semibold transition ${
+            isValid
+              ? "bg-blue-600 text-white hover:bg-blue-700"
+              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          }`}
+        >
+          Start Assessment
+        </button>
+      </div>
+    </main>
+  );
+}
+
+  // =========================
+  // RESULT SCREEN
+  // =========================
+
+  if (stage === "result") {
+    const totalScore = calculateScore(answers);
+    const band = getBand(totalScore);
+
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-gray-50 p-6">
+        <div className="bg-white shadow-xl rounded-2xl p-10 w-full max-w-2xl text-center space-y-6">
+          <h1 className="text-3xl font-bold text-black">
+            Your Experimentation Maturity Score
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+
+          <div className="text-5xl font-bold text-blue-600">
+            {totalScore}
+          </div>
+
+          <div className="text-2xl font-semibold text-black">
+            {band.title}
+          </div>
+
+          <p className="text-gray-600">
+            {band.recommendation}
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
       </main>
-    </div>
+    );
+  }
+
+  // =========================
+  // QUESTION SCREEN
+  // =========================
+
+  return (
+    <main className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-6">
+      <div className="w-full max-w-2xl space-y-6">
+
+        {/* Progress Bar */}
+        <div className="w-full bg-gray-200 rounded-full h-2">
+          <div
+            className="bg-blue-600 h-2 rounded-full transition-all"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+
+        <p className="text-sm text-gray-500">
+          Question {current + 1} of {questions.length}
+        </p>
+
+        <div className="bg-white shadow-lg rounded-2xl p-8 space-y-6">
+          <h1 className="text-xl font-semibold text-center text-black">
+            {question.text}
+          </h1>
+
+         <div className="flex flex-col gap-4">
+  {question.options.map((option, index) => (
+    <button
+      key={index}
+      onClick={() => handleAnswer(option.score)}
+      className="px-6 py-4 border rounded-lg bg-white text-black hover:bg-gray-100 transition text-left"
+    >
+      {option.label}
+    </button>
+  ))}
+
+  {/* Finish button only on last question */}
+  {current === questions.length - 1 && (
+    <button
+      onClick={() => setStage("result")}
+      disabled={!answers[question.id]}
+      className={`w-full mt-4 p-4 rounded-lg font-semibold transition ${
+        answers[question.id]
+          ? "bg-blue-600 text-white hover:bg-blue-700"
+          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+      }`}
+    >
+      Finish Assessment
+    </button>
+  )}
+</div>
+        </div>
+      </div>
+    </main>
   );
 }
