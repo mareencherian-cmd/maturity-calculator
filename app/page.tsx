@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { questions } from "@/lib/questions";
-import { calculateScore, getBand } from "@/lib/score";
+import { calculateScore, getBand, bands } from "@/lib/score";
 
 export default function Home() {
   const [stage, setStage] = useState<"lead" | "questions" | "result">("lead");
@@ -140,6 +140,36 @@ export default function Home() {
           <p className="text-gray-600">
             {band.recommendation}
           </p>
+          <div className="mt-8 text-left">
+  <h3 className="text-lg font-semibold mb-4 text-center">
+    Experimentation Maturity Spectrum
+  </h3>
+
+  <div className="space-y-2">
+    {bands.map((b) => {
+      const isActive =
+        totalScore >= b.min && totalScore <= b.max;
+
+      return (
+        <div
+          key={b.title}
+          className={`p-3 rounded-lg text-white ${b.bgColor} ${
+            isActive ? "opacity-100" : "opacity-40"
+          }`}
+        >
+          <div className="flex justify-between">
+            <span className="font-semibold">
+              {b.title}
+            </span>
+            <span>
+              {b.min} – {b.max}
+            </span>
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</div>
         </div>
       </main>
     );
