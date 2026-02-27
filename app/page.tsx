@@ -141,7 +141,7 @@ export default function Home() {
   {band.recommendation}
 </p>
           <div className="mt-8 text-left">
-  <h3 className="text-lg font-semibold mb-4 text-center">
+  <h3 className="text-lg font-semibold mb-4 text-center text-gray-800">
     Experimentation Maturity Spectrum
   </h3>
 
