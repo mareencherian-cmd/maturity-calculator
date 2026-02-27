@@ -137,7 +137,7 @@ export default function Home() {
             {band.title}
           </div>
 
-          <p className="text-gray-600">
+          <p className="text-black-600">
             {band.recommendation}
           </p>
           <div className="mt-8 text-left">
@@ -218,8 +218,8 @@ export default function Home() {
       disabled={!answers[question.id]}
       className={`w-full mt-4 p-4 rounded-lg font-semibold transition ${
         answers[question.id]
-          ? "bg-blue-600 text-white hover:bg-blue-700"
-          : "bg-gray-300 text-gray-500 cursor-not-allowed"
+          ? "bg-blue-600 text-black hover:bg-blue-700"
+          : "bg-gray-300 text-black-500 cursor-not-allowed"
       }`}
     >
       Finish Assessment
