@@ -133,13 +133,13 @@ export default function Home() {
             {totalScore}
           </div>
 
-          <div className="text-2xl font-semibold text-black">
-            {band.title}
-          </div>
+          <h2 className={`text-2xl font-bold ${band.textColor}`}>
+  {band.title}
+</h2>
 
-          <p className="text-black-600">
-            {band.recommendation}
-          </p>
+         <p className="mt-3 text-gray-700">
+  {band.recommendation}
+</p>
           <div className="mt-8 text-left">
   <h3 className="text-lg font-semibold mb-4 text-center">
     Experimentation Maturity Spectrum
@@ -147,27 +147,26 @@ export default function Home() {
 
   <div className="space-y-2">
     {bands.map((b) => {
-      const isActive =
-        totalScore >= b.min && totalScore <= b.max;
+  const isActive = totalScore >= b.min && totalScore <= b.max;
 
-      return (
-        <div
-          key={b.title}
-          className={`p-3 rounded-lg text-black ${b.bgColor} ${
-            isActive ? "opacity-100" : "opacity-40"
-          }`}
-        >
-          <div className="flex justify-between">
-            <span className="font-semibold">
-              {b.title}
-            </span>
-            <span>
-              {b.min} – {b.max}
-            </span>
-          </div>
-        </div>
-      );
-    })}
+  return (
+    <div
+      key={b.title}
+      className={`
+        rounded-xl p-6 mb-4 flex justify-between items-center
+        ${b.bgColor}
+        ${isActive ? "ring-4 ring-black" : ""}
+      `}
+    >
+      <span className={`font-semibold ${isActive ? "text-black" : "text-gray-700"}`}>
+        {b.title}
+      </span>
+      <span className="text-black font-medium">
+        {b.min} – {b.max}
+      </span>
+    </div>
+  );
+})}
   </div>
 </div>
         </div>
